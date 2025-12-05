@@ -1,16 +1,33 @@
 <!DOCTYPE html>
 <html>
+    <head>
+    <meta charset="UTF-8">
+    <title>Mi Aplicación</title>
+    
+    <link rel="stylesheet" href="./css/style.css">
+
+    </head>
+<body>
+
+    <ul class="barraSuperior">
+        <li class="izq">All in Casino</li>
+        <a class="enlace" href="/perfil"><li class="der" id="cuenta">{{nombre}}</li></a>
+        <a class="enlace" href="/wallet"><li class="der" id="saldo">{{saldo}}$</li></a>
+   </ul>
+
     <div class="fondoMain">
     <h2>Registate con tu cuenta</h2>
     <form method="post" action="/logIn">
-        Nombre:     <input id="username"><br>
-        Contraseña: <input type="password" id="password1"><br>
-        Confirmar contraseña: <input type="password" id="password2"><br>
+        Nombre: <input id="username"><br>
+        Contraseña: <input type="password" id="password"><br>
+
         <button type="button" onclick="enviarFormulario()">Ingresar</button>
     </form>
-    <p><a href="/signUp">Crea una cuenta</a></p>
-    
+    <p><a href="/signUp.html">Crea una cuenta</a></p>
+
     <span id="mensaje"></span>
+
+    </div>
     
     <script src="js/logIn.js"></script>
 </html>

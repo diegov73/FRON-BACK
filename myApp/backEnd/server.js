@@ -1,3 +1,6 @@
+// archivos para instalar a traves de npm
+// "mongoose mongodb jsonwebtoken patch express cors"
+
 const express = require('express');
 const cors = require('cors');
 const mongoose = require('mongoose');
@@ -20,8 +23,9 @@ mongoose.connect(adressDB)
     console.error('❌ Error de conexión a la Base de Datos:', error);
 });
 
+//---signUp---
 app.post('/signUp',async(req, res) =>{
-    console.log('peticion recibida en /logIn');
+    console.log('peticion recibida en /signUp');
     console.log('body:', req.body);
 
     try{
@@ -54,6 +58,44 @@ app.post('/signUp',async(req, res) =>{
         res.status(500).json({error: 'hubo un error interno en el servidor, logIn'})
     }
 })
+
+//---logIn---
+app.post('/logIn', async(req,res)=>{
+    console.log('peticion recibida en /logIn');
+    console.log('body: ', req.body);
+
+    try{
+        if(!req.body){
+            throw new error('body vacio');
+        }
+        const{username, password} = req.body;
+
+        const User = await Usuario.findOne({username, password});
+        
+        if(!User){
+            return res.status(400).json({
+                mensaje: 'Usuario no existente',
+                status: false
+            })
+        }
+
+        const token = jwt.sign(
+            {id: User._id, username: User.username},
+            SECRET_KEY,
+            {expiresIn: '1H'}
+        );
+
+        res.json({
+            mensaje: 'bienvenido',
+            status: true,
+            token: token
+        })
+    }
+    catch(error){
+        console.error('error en el sevidor:', error.message);
+        res.status(500).json({error: 'hubo un error interno en el servidor, logIn'})
+    }
+});
 
 app.listen(port, () =>{
     console.log(`backEend corriendo en http//locahost:${port}`);
