@@ -11,7 +11,10 @@ const jwt = require('jsonwebtoken');
 
 const SECRET_KEY = 'TUTUTUDU_MAX_VERSTAPPEN';
 
-app.use(cors());
+app.use(cors({
+    origin: 'http://localhost:3000',
+    credentials: true
+}));
 app.use(express.json());
 
 const adressDB = 'mongodb+srv://BTF6:tututuduMaxVerstappen@zzzerver.d9ofxax.mongodb.net/?retryWrites=true&w=majority&appName=zzzerver';
@@ -96,6 +99,41 @@ app.post('/logIn', async(req,res)=>{
         res.status(500).json({error: 'hubo un error interno en el servidor, logIn'})
     }
 });
+
+app.get('/loadData', async(req,res)=>{
+    try{
+        const cookies = req.headers.cookie;
+
+        if(!cookies) return res.status(401).json({error: 'sesion no iniciada'});
+
+        const tokenString = cookies.split('; ').find(row => row.startsWith('jwt_token='));
+
+        if(!tokenString) return res.status(401).json({error: 'token no encontrado'});
+        
+        const token = tokenString.split('=')[1];
+
+        const decoded = jwt.verify(token, SECRET_KEY);
+
+        console.log('id recuperado desde el token', decoded.id);
+
+        const usuarioEncontrado = await Usuario.findById(decoded.id).select('-password');
+
+        if(!usuarioEncontrado) return res.status(404).json({error: ' usuario no encontrado en la DB'});
+
+        res.json({
+            mensaje: 'datos cargados',
+            usuario:{
+                username: usuarioEncontrado.username,
+                balance: usuarioEncontrado.balance,
+                historial: usuarioEncontrado.historial
+            }
+        });
+    }
+    catch(error){
+        console.error(error);
+        res.status(401).json({error: 'token invalido o expirado'});
+    }
+})
 
 app.listen(port, () =>{
     console.log(`backEend corriendo en http//locahost:${port}`);
