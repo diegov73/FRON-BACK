@@ -135,6 +135,64 @@ app.get('/loadData', async(req,res)=>{
     }
 })
 
+app.post('/api/actualizarJuego', async (req, res) => {
+    try {
+        // 1. Autenticar usuario desde el token en la cookie
+        const cookies = req.headers.cookie;
+        if (!cookies) {
+            return res.status(401).json({ error: 'Sesión no iniciada, no se encontraron cookies.' });
+        }
+
+        const tokenString = cookies.split('; ').find(row => row.startsWith('jwt_token='));
+        if (!tokenString) {
+            return res.status(401).json({ error: 'Token no encontrado.' });
+        }
+        
+        const token = tokenString.split('=')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+        
+        // 2. Obtener datos del cuerpo de la petición
+        const { gananciaNeta, detalles } = req.body;
+        if (gananciaNeta === undefined || !detalles) {
+            return res.status(400).json({ error: 'Datos del juego incompletos.' });
+        }
+
+        // 3. Encontrar y actualizar el usuario en la DB
+        const usuario = await Usuario.findById(decoded.id);
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado en la DB.' });
+        }
+
+        // 4. Actualizar balance y historial
+        usuario.balance += gananciaNeta;
+
+        const nuevoResultado = {
+            numeroGanador: detalles.numeroGanador,
+            colorGanador: detalles.colorGanador,
+            tipoApuesta: detalles.tipoApuesta,
+            totalApostado: detalles.totalApostado,
+            variacion: gananciaNeta,
+            fecha: new Date()
+        };
+        usuario.Resultados.push(nuevoResultado);
+
+        // 5. Guardar y responder
+        await usuario.save();
+
+        res.json({
+            mensaje: 'Juego guardado exitosamente.',
+            nuevoSaldo: usuario.balance
+        });
+
+    } catch (error) {
+        console.error('Error en /api/actualizarJuego:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Token inválido.' });
+        }
+        res.status(500).json({ error: 'Error interno del servidor al actualizar el juego.' });
+    }
+});
+
 app.listen(port, () =>{
     console.log(`backEend corriendo en http//locahost:${port}`);
 })
