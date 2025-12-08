@@ -193,6 +193,57 @@ app.post('/api/actualizarJuego', async (req, res) => {
     }
 });
 
+app.post('/api/wallet/update', async (req, res) => {
+    try {
+        const cookies = req.headers.cookie;
+        if (!cookies) {
+            return res.status(401).json({ error: 'Sesión no iniciada.' });
+        }
+
+        const tokenString = cookies.split('; ').find(row => row.startsWith('jwt_token='));
+        if (!tokenString) {
+            return res.status(401).json({ error: 'Token no encontrado.' });
+        }
+
+        const token = tokenString.split('=')[1];
+        const decoded = jwt.verify(token, SECRET_KEY);
+        const userId = decoded.id;
+
+        const { amount, action } = req.body;
+
+        if (!amount || amount <= 0) {
+            return res.status(400).json({ error: 'Cantidad no válida.' });
+        }
+
+        const usuario = await Usuario.findById(userId);
+        if (!usuario) {
+            return res.status(404).json({ error: 'Usuario no encontrado.' });
+        }
+
+        if (action === 'add') {
+            usuario.balance += amount;
+        } else if (action === 'subtract') {
+            if (usuario.balance < amount) {
+                return res.status(400).json({ error: 'Saldo insuficiente.' });
+            }
+            usuario.balance -= amount;
+        } else {
+            return res.status(400).json({ error: 'Acción no válida.' });
+        }
+
+        await usuario.save();
+
+        res.json({ nuevoSaldo: usuario.balance });
+
+    } catch (error) {
+        console.error('Error en /api/wallet/update:', error);
+        if (error.name === 'JsonWebTokenError') {
+            return res.status(401).json({ error: 'Token inválido.' });
+        }
+        res.status(500).json({ error: 'Error interno del servidor.' });
+    }
+});
+
 app.listen(port, () =>{
     console.log(`backEend corriendo en http//locahost:${port}`);
 })

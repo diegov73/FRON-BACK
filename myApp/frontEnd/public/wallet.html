@@ -19,17 +19,18 @@
    </ul>
 
     <div class="fondoMain">
-    <form method="post" action="/wallet">
-        Agregar: <input type="number" name="add">
-        <button type="submit">Confirmar</button>
-    </form>
+        <h2>Gestionar Saldo</h2>
+        <div>
+            Agregar: <input type="number" id="add-amount">
+            <button type="button" onclick="agregarDinero()">Confirmar</button>
+        </div>
+        <div style="margin-top: 10px;">
+            Retirar: <input type="number" id="subtract-amount">
+            <button type="button" onclick="retirarDinero()">Confirmar</button>
+        </div>
+        <span id="mensaje"></span>
 
-    <form method="post" action="/wallet">
-        Retirar: <input type="number" name="subtrac">
-        <button type="submit">Confirmar</button>
-    </form>
-
-    <h2>Historial de transacciones</h2>
+        <h2 style="margin-top: 30px;">Historial de transacciones</h2>
 
     {{#if historial.length}}
         <ul>
