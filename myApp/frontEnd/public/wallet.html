@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="./css/style.css"> 
+    <meta charset='utf-8'>
+</head>
+<body>
+
+    <ul class="barraSuperior">
+        <li class="izq">All in Casino</li>
+        
+        <a class="enlace" href="/perfil">
+            <li class="der" id="cuenta">Cargando...</li>
+        </a>
+        
+        <a class="enlace" href="wallet.html">
+            <li class="der" id="saldo">--- $</li>
+        </a>
+   </ul>
+
+    <div class="fondoMain">
+    <form method="post" action="/wallet">
+        Agregar: <input type="number" name="add">
+        <button type="submit">Confirmar</button>
+    </form>
+
+    <form method="post" action="/wallet">
+        Retirar: <input type="number" name="subtrac">
+        <button type="submit">Confirmar</button>
+    </form>
+
+    <h2>Historial de transacciones</h2>
+
+    {{#if historial.length}}
+        <ul>
+            {{#each historial}}
+                <li>
+                    {{this.tipo}} de ${{this.monto}} — {{this.fecha}}
+                </li>
+            {{/each}}
+        </ul>
+    {{else}}
+        <p>No tienes transacciones aún.</p>
+    {{/if}}
+       <a href="/ruleta" class="link" 
+               style="display: inline-block; text-decoration: none; padding: 10px 20px; margin-top: 15px;">
+                Volver a apostar
+        </a>
+    </div>
+
+    <script src="./js/wallet.js"></script>
+</body>
+</html>
