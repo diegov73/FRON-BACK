@@ -8,6 +8,7 @@ const Usuario = require('./models/Usuario');
 const app = express();
 const port = 4000;
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 
 const SECRET_KEY = 'TUTUTUDU_MAX_VERSTAPPEN';
 
@@ -37,9 +38,12 @@ app.post('/signUp',async(req, res) =>{
         }
         const{username, passWord1, password2} = req.body;
 
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(passWord1, salt);
+
         const newUser = new Usuario({
             username: username,
-            password: passWord1
+            password: hashedPassword
         });
 
         await newUser.save();
@@ -75,9 +79,18 @@ app.post('/logIn', async(req,res)=>{
 
         const User = await Usuario.findOne({username, password});
         
-        if(!User){
+        if(!user){
             return res.status(400).json({
                 mensaje: 'Usuario no existente',
+                status: false
+            })
+        }
+
+        const isMatch = await bcrypt.compare(password, user.password);
+
+        if(!isMatch){
+            return res.status(400).json({
+                mensaje: 'Contraseña incorrecta',
                 status: false
             })
         }

@@ -5,9 +5,8 @@ function verificarSesionInversa() {
         .split('; ')
         .find(row => row.startsWith('jwt_token='));
 
-    // 2. Si SI existe, lo mandamos al perfil
     if (cookieExiste) {
-        window.location.href = './perfil.html'; // Cambia esto por tu página de perfil
+        window.location.href = './ruleta.html'; 
     }
 }
 
