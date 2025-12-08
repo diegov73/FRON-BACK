@@ -1,3 +1,19 @@
+// Función de seguridad
+function verificarSesion() {
+    // 1. Buscamos la cookie llamada 'jwt_token'
+    const cookieExiste = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt_token='));
+
+    // 2. Si NO existe, lo mandamos afuera
+    if (!cookieExiste) {
+        alert("Debes iniciar sesión para ver esta página.");
+        window.location.href = 'landSite.html'; // Cambia esto por tu 'landSite' (ej: login.html)
+    }
+}
+
+// EJECUTAR INMEDIATAMENTE
+verificarSesion();
 const api_load_url = 'http://localhost:4000/loadData';
 const api_update_url = 'http://localhost:4000/api/wallet/update';
 

@@ -1,3 +1,18 @@
+// Función de seguridad inversa
+function verificarSesionInversa() {
+    // 1. Buscamos la cookie llamada 'jwt_token'
+    const cookieExiste = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt_token='));
+
+    // 2. Si SI existe, lo mandamos al perfil
+    if (cookieExiste) {
+        window.location.href = './perfil.html'; // Cambia esto por tu página de perfil
+    }
+}
+
+// EJECUTAR INMEDIATAMENTE
+verificarSesionInversa();
 const api_url = 'http://localhost:4000/logIn';
 
 async function enviarFormulario(){
@@ -27,7 +42,7 @@ async function enviarFormulario(){
 
         document.cookie = `jwt_token=${data.token}; path=/; max-age-3600`;
 
-        window.location.href = "/ruleta.html";
+        window.location.href = "./ruleta.html";
     }
     catch(error){
         resultadoSpan.textContent = 'Error: No se pudo conectar con el servidor';
